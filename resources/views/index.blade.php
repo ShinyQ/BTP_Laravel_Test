@@ -54,13 +54,20 @@
                                 <td>
                                     <ul>
                                         @foreach($method->activity as $activity)
-                                            @if((int) explode("-",$activity->start)[1] == $i)
-                                            <li>
+                                            @if((int) explode("-", $activity->start)[1] == $i)
+                                            <li class="mb-2">
                                                 <a class="activity activity-link" data-bs-toggle="modal" data-bs-target="#activityEditModal" href="#" data-id="
                                                     {{ $activity->id }}">{{ $activity->name }}
                                                 </a>
                                                 <br>
-                                                <span class="activity-date">({{ $activity->start }} - {{ $activity->end }})</span>
+                                                @php
+                                                     $date = str_replace('-', '/', $activity->start);
+                                                     $start_activity = date("d/m/Y", strtotime($date));
+
+                                                     $date = str_replace('-', '/', $activity->end);
+                                                     $end_activity = date("d/m/Y", strtotime($date));
+                                                @endphp
+                                                <span class="activity-date">({{ $start_activity }} - {{ $end_activity }})</span>
                                             </li>
                                             @endif
                                         @endforeach

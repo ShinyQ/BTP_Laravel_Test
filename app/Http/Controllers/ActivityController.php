@@ -30,12 +30,12 @@ class ActivityController extends Controller
         $data = $request->validated();
         Activity::where('id', $id)->update($data);
 
-        return Response::json(['success' => 'Metode Berhasil Diupdate']);
+        return Response::json(['success' => 'Aktivitas Berhasil Diupdate']);
     }
 
     public function destroy($id)
     {
         Activity::where('id', $id)->delete();
-        return Response::json(['success' => 'Metode Berhasil Dihapus']);
+        return Response::json(['success' => 'Aktivitas Berhasil Dihapus']);
     }
 }
