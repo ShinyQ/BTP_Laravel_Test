@@ -8,7 +8,10 @@ use Response;
 class HomeController extends Controller
 {
     public function index(){
-        $methods = Method::orderBy('id', 'asc')->get();
+        $methods = Method::with('activity')
+            ->orderBy('id')
+            ->get();
+
         $months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni"];
 
         return view('index', compact('methods', 'months'));

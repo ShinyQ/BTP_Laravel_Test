@@ -20,7 +20,6 @@ class CreateActivitiesTable extends Migration
             $table->date('start');
             $table->date('end');
             $table->enum('status', ['Berlangsung', 'Selesai', 'Akan Datang']);
-            $table->string('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

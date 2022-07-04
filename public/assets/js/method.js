@@ -5,7 +5,7 @@ $(document).ready(function(){
         }
     });
 
-    $(".activity").click(function(e){
+    $(".method").click(function(e){
         e.preventDefault()
 
         $.get("/method/" + $(this).data('id'), function (res) {
@@ -15,8 +15,9 @@ $(document).ready(function(){
             $('#editIdMethod').val(data.id)
 
             if (data.is_default === false) {
-                $("#editFormMethodDescription").hide()
+                $('#editFormMethodDescription').hide()
             } else {
+                $('#editFormMethodDescription').show()
                 $('#editDescriptionMethod').val(data.description)
             }
         })

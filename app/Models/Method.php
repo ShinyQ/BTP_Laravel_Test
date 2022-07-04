@@ -14,7 +14,7 @@ class Method extends Model
     public $fillable = ['name', 'is_default', 'description'];
 
     public function activity(){
-        return $this->hasMany(Activity::class, 'activity_id', 'id');
+        return $this->hasMany(Activity::class, 'method_id', 'id')->orderBy('start');
     }
 
 }

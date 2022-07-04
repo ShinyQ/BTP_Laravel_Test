@@ -10,5 +10,5 @@ class Activity extends Model
 {
     use HasFactory, SoftDeletes;
 
-    public $fillable = ['name', 'year', 'month', 'start', 'end', 'description'];
+    public $fillable = ['method_id', 'name', 'start', 'end', 'status'];
 }

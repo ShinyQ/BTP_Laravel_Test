@@ -54,7 +54,7 @@ class MethodsSeeder extends Seeder
             [
                 'name' => "Job Assignment",
                 'is_default' => 1,
-                'description' => 'Sesuai Penugasn',
+                'description' => 'Sesuai Penugasan',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],

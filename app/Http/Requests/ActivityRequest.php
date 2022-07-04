@@ -24,7 +24,19 @@ class ActivityRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => ['string'],
+            'method_id' => ['required'],
+            'start' => ['required'],
+            'end' => ['required'],
+            'status' => ['required'],
         ];
+    }
+
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        throw new \Illuminate\Validation\ValidationException($validator, Response::json([
+            'code' => 400,
+            'error' => $validator->errors()->all()
+        ]));
     }
 }

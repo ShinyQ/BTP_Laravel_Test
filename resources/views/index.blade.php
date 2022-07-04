@@ -42,7 +42,7 @@
                 @foreach ($methods as $method)
                     <tr>
                         <td class="align-middle text-center">
-                            <a class="activity" data-bs-toggle="modal" id="methodModal" data-bs-target="#editMethodModal" href="#" data-id="{{ $method->id }}">
+                            <a class="method activity-link" data-bs-toggle="modal" id="methodModal" data-bs-target="#editMethodModal" href="#" data-id="{{ $method->id }}">
                                 {{ $method->name }}
                             </a>
                         </td>
@@ -50,18 +50,20 @@
                         @if($method->is_default)
                             <td colspan="6" class="align-middle text-center">{{ $method->description }}</td>
                         @else
-                            @for ($j = 0; $j < 6; $j++)
+                            @for ($i = 1; $i < 7; $i++)
                                 <td>
                                     <ul>
-                                        <li>
-                                            <a class="activity" data-bs-toggle="modal" data-bs-target="#activityModal" href="#" data-id="{{ $j }}">Problem Solving And Decision Making</a>
-                                            <span class="activity-date">(02/01/2019 - 05/01/2019)</span>
-                                        </li>
-                                        <br>
-                                        <li>
-                                            Problem Solving And Decision Making
-                                            <span class="activity-date">(02/01/2019 - 05/01/2019)</span>
-                                        </li>
+                                        @foreach($method->activity as $activity)
+                                            @if((int) explode("-",$activity->start)[1] == $i)
+                                            <li>
+                                                <a class="activity activity-link" data-bs-toggle="modal" data-bs-target="#activityEditModal" href="#" data-id="
+                                                    {{ $activity->id }}">{{ $activity->name }}
+                                                </a>
+                                                <br>
+                                                <span class="activity-date">({{ $activity->start }} - {{ $activity->end }})</span>
+                                            </li>
+                                            @endif
+                                        @endforeach
                                     </ul>
                                 </td>
                             @endfor
@@ -70,6 +72,164 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
+</div>
+
+<!--
+   Add Activity Modal
+-->
+<div class="modal fade" id="addActivityModal" tabindex="-1" aria-labelledby="addActivityModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addActivityModalLabel">Tambah Aktivitas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formReview" data-id="">
+                    <div class="form-row">
+                        <div class="form-group mb-3">
+                            <label>Metode Aktivitas</label>
+                            <select class="form-select" id="idMethodActivity">
+                                @foreach($methods as $data)
+                                    @if(!$data->is_default)
+                                        <option value="{{ $data->id }}">{{ $data->name }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label>Nama Aktivitas</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="nameActivity">
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label>Tanggal Aktivitas Mulai</label>
+                            <div class="input-group">
+                                <input type="date" class="form-control" id="startActivity" min="2022-01-01" max="2022-06-30">
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label>Tanggal Aktivitas Berakhir</label>
+                            <div class="input-group">
+                                <input type="date" class="form-control" id="endActivity" min="2022-01-01" max="2022-06-30">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select class="form-select" id="statusActivity" >
+                            <option value="Berlangsung">Berlangsung</option>
+                            <option value="Selesai">Selesai</option>
+                            <option value="Akan Datang">Akan Datang</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnAddActivity">Simpan Aktivitas</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
+   Edit Activity Modal
+-->
+<div class="modal fade" id="activityEditModal" tabindex="-1" aria-labelledby="activityModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activityModalLabel">Edit Aktivitas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="formReview" data-id="">
+                    <div class="form-row">
+                        <input type="hidden" id="editIdActivity">
+
+                        <div class="form-group mb-3">
+                            <label>Metode Aktivitas</label>
+                            <select class="form-select" id="editMethodActivity">
+                                @foreach($methods as $data)
+                                    @if(!$data->is_default)
+                                        <option value="{{ $data->id }}">{{ $data->name }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label>Nama Aktivitas</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="editNameActivity">
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label>Tanggal Aktivitas Mulai</label>
+                            <div class="input-group">
+                                <input type="date" class="form-control" id="editStartActivity" min="2022-01-01" max="2022-06-30">
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label>Tanggal Aktivitas Berakhir</label>
+                            <div class="input-group">
+                                <input type="date" class="form-control" id="editEndActivity" min="2022-01-01" max="2022-06-30">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-select" id="editStatusActivity" >
+                                <option>Berlangsung</option>
+                                <option>Selesai</option>
+                                <option>Akan Datang</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                    id="btnDeleteActivity"
+                    data-bs-target="#deleteActivityModal"
+                    data-bs-toggle="modal"
+                    data-bs-dismiss="modal"
+                    class="btn btn-outline-danger">
+                    Hapus
+                </button>
+                <button type="button" class="btn btn-primary" id="btnUpdateActivity">Update Aktivitas</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
+   Delete Method Modal
+-->
+<div class="modal fade" id="deleteActivityModal" aria-hidden="true" aria-labelledby="deleteActivityModalLabel" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteActivityModalLabel">Hapus Aktivitas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" class="form-control" id="deleteIdActivity">
+                Apakah Anda Yakin Ingin Menghapus Aktivitas?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="btnDeleteActivityFinal">Hapus</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -181,139 +341,13 @@
     </div>
 </div>
 
-<!--
-   Add Activity Modal
--->
-<div class="modal fade" id="addActivityModal" tabindex="-1" aria-labelledby="addActivityModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addActivityModalLabel">Tambah Aktivitas</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formReview" data-id="">
-                    <div class="form-row">
-                        <div class="form-group mb-3">
-                            <label>Metode Aktivitas</label>
-                            <select class="form-select" id="status">
-                                @foreach($methods as $data)
-                                    @if(!$data->is_default)
-                                        <option value="{{ $data->id }}">{{ $data->name }}</option>
-                                    @endif
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label>Nama Aktivitas</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="name">
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label>Tanggal Aktivitas Mulai</label>
-                            <div class="input-group">
-                                <input type="date" class="form-control" id="start">
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label>Tanggal Aktivitas Berakhir</label>
-                            <div class="input-group">
-                                <input type="date" class="form-control" id="end">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label>Deskripsi Aktivitas</label>
-                        <div class="input-group">
-                            <textarea class="form-control h-25" id="description" rows="3"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select class="form-select" id="status" >
-                            <option>Berlangsung</option>
-                            <option>Selesai</option>
-                            <option>Akan Datang</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Simpan Aktivitas</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!--
-   Edit Activity Modal
--->
-<div class="modal fade" id="activityModal" tabindex="-1" aria-labelledby="activityModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="activityModalLabel">Edit Aktivitas</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formReview" data-id="">
-                    <div class="form-row">
-                        <div class="form-group mb-3">
-                            <label>Nama Aktivitas</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="name">
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label>Tanggal Aktivitas Mulai</label>
-                            <div class="input-group">
-                                <input type="date" class="form-control" id="start">
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label>Tanggal Aktivitas Berakhir</label>
-                            <div class="input-group">
-                                <input type="date" class="form-control" id="end">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label>Deskripsi Barang</label>
-                        <div class="input-group">
-                            <textarea class="form-control h-25" id="ddescription" rows="3"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select class="form-select" id="status" >
-                            <option>Berlangsung</option>
-                            <option>Selesai</option>
-                            <option>Akan Datang</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Update Aktivitas</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 <script src="{{ asset('assets/js/bootstrap.bundle.js') }}"></script>
 
 <script src="{{ asset('assets/js/config.js') }}"></script>
 <script src="{{ asset('assets/js/method.js') }}"></script>
+<script src="{{ asset('assets/js/activity.js') }}"></script>
 
 </body>
 </html>

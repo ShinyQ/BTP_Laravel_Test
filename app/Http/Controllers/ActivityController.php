@@ -2,62 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\ActivityRequest;
+use App\Models\Activity;
+use Response;
 
 class ActivityController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
+    public function store(ActivityRequest $request){
+        $data = $request->validated();
+        Activity::create($data);
+
+        return Response::json(['success' => 'Aktivitas Berhasil Ditambahkan']);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
+        $data = Activity::findOrFail($id);
+
+        return Response::json([
+            'success' => 'Sukses Mendapat Detail Aktivitas',
+            'data' => $data
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function update(ActivityRequest $request, $id)
     {
-        //
+        $data = $request->validated();
+        Activity::where('id', $id)->update($data);
+
+        return Response::json(['success' => 'Metode Berhasil Diupdate']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        Activity::where('id', $id)->delete();
+        return Response::json(['success' => 'Metode Berhasil Dihapus']);
     }
 }

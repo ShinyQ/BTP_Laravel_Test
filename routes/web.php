@@ -22,5 +22,5 @@ Route::get('/token', function () {
 });
 
 Route::apiResource('method', MethodController::class);
-Route::apiResource('activity', ActivtyController::class);
+Route::apiResource('activity', ActivityController::class);
 

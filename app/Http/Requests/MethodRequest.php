@@ -32,6 +32,9 @@ class MethodRequest extends FormRequest
 
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
-        throw new \Illuminate\Validation\ValidationException($validator, \Api::apiRespond(400, $validator->errors()->all()));
+        throw new \Illuminate\Validation\ValidationException($validator, Response::json([
+            'code' => 400,
+            'error' => $validator->errors()->all()
+        ]));
     }
 }
