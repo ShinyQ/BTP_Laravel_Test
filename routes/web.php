@@ -17,9 +17,7 @@ use App\Http\Controllers\ActivityController;
 */
 
 Route::get('/', [HomeController::class, 'index']);
-Route::get('/token', function () {
-    return csrf_token();
-});
+Route::get('/load_table', [HomeController::class, 'load_table']);
 
 Route::apiResource('method', MethodController::class);
 Route::apiResource('activity', ActivityController::class);

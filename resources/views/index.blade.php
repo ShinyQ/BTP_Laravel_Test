@@ -9,6 +9,7 @@
 
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 </head>
@@ -17,7 +18,7 @@
 <div class="container pt-3">
     <h3>Learning Activity - Year 1 (Januari s/d Juli 2022)</h3>
 
-    <div class="mt-5">
+    <div class="mt-4 mb-4">
         @if(!$methods->isEmpty())
             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addActivityModal">
                 <i class="bi bi-calendar-plus-fill"></i> &nbsp; Tambah Aktivitas
@@ -28,56 +29,17 @@
         </button>
     </div>
 
-    <div class="table-sticky table-responsive mt-3 mb-5">
-        <table class="table-bordered table">
+    <div class="table-responsive mt-3">
+        <table id="table-activity" class="table-bordered table">
             <thead class="table-dark">
-                <tr class="text-center">
-                    <th scope="col" class="">Metode</th>
-                    @foreach($months as $month)
-                        <th scope="col" class="">{{ $month }}</th>
-                    @endforeach
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($methods as $method)
-                    <tr>
-                        <td class="align-middle text-center">
-                            <a class="method activity-link" data-bs-toggle="modal" id="methodModal" data-bs-target="#editMethodModal" href="#" data-id="{{ $method->id }}">
-                                {{ $method->name }}
-                            </a>
-                        </td>
-
-                        @if($method->is_default)
-                            <td colspan="6" class="align-middle text-center">{{ $method->description }}</td>
-                        @else
-                            @for ($i = 1; $i < 7; $i++)
-                                <td>
-                                    <ul>
-                                        @foreach($method->activity as $activity)
-                                            @if((int) explode("-", $activity->start)[1] == $i)
-                                            <li class="mb-2">
-                                                <a class="activity activity-link" data-bs-toggle="modal" data-bs-target="#activityEditModal" href="#" data-id="
-                                                    {{ $activity->id }}">{{ $activity->name }}
-                                                </a>
-                                                <br>
-                                                @php
-                                                     $date = str_replace('-', '/', $activity->start);
-                                                     $start_activity = date("d/m/Y", strtotime($date));
-
-                                                     $date = str_replace('-', '/', $activity->end);
-                                                     $end_activity = date("d/m/Y", strtotime($date));
-                                                @endphp
-                                                <span class="activity-date">({{ $start_activity }} - {{ $end_activity }})</span>
-                                            </li>
-                                            @endif
-                                        @endforeach
-                                    </ul>
-                                </td>
-                            @endfor
-                        @endif
-                    </tr>
+            <tr class="text-center">
+                <th scope="col" class="">Metode</th>
+                @foreach($months as $month)
+                    <th scope="col" class="">{{ $month }}</th>
                 @endforeach
-            </tbody>
+            </tr>
+            </thead>
+            <tbody id="tblBody"></tbody>
         </table>
     </div>
 </div>
@@ -350,11 +312,102 @@
 
 <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+
 <script src="{{ asset('assets/js/bootstrap.bundle.js') }}"></script>
 
 <script src="{{ asset('assets/js/config.js') }}"></script>
 <script src="{{ asset('assets/js/method.js') }}"></script>
 <script src="{{ asset('assets/js/activity.js') }}"></script>
+
+<script>
+    $(document).ready(function(){
+        const generateMetodeComponent = (id, name, rows) => {
+            return `
+                <tr>
+                    <td class="align-middle text-center">
+                        <a class="method activity-link" data-bs-toggle="modal" id="methodModal" data-bs-target="#editMethodModal" href="#" data-id="${id}">
+                            ${name}
+                        </a>
+                        ${rows}
+                    </td>
+                </tr>
+            `
+        }
+
+        const generateActivity = (id, name) => {
+            return `
+                <li class="mb-2">
+                    <a class="activity activity-link" data-bs-toggle="modal" data-bs-target="#activityEditModal" href="#" data-id="${id}">${name}</a>
+                    <br>
+                    <span class="activity-date">(02/01/2022 - 05/01/2022)</span>
+                </li>
+            `
+        }
+
+        const generateActivityDefault = (id, name) => {
+            return `
+                 <tr>
+                    <td class="align-middle text-center">
+                        <a class="method activity-link" data-bs-toggle="modal" id="methodModal" data-bs-target="#editMethodModal" href="#" data-id="${id}">
+                            ${name}
+                        </a>
+                    </td>
+
+                    <td colspan="6" class="align-middle text-center">Sesuai Penugasan</td>
+                    <td style="display: none"></td>
+                    <td style="display: none"></td>
+                    <td style="display: none"></td>
+                    <td style="display: none"></td>
+                    <td style="display: none"></td>
+                    <td style="display: none"></td>
+                </tr>
+            `
+        }
+        const bulan = @json($months);
+        const generateBulan = (length) => {
+            let res = ``
+
+            for (let index = 0; index < length; index++) {
+                let className = `row${bulan[index]}`
+                res += `<td><ul class="${className}"></ul></td>`
+            }
+
+            return res
+        }
+
+        let data = @json($methods);
+        let rows = generateBulan(bulan.length)
+
+        for (let i = 0; i < data.length; i++) {
+            if(data[i].is_default === true){
+                $('#tblBody').append(generateActivityDefault(data[i].id, data[i].name))
+            } else {
+                $('#tblBody').append(generateMetodeComponent(data[i].id, data[i].name, rows))
+
+                for (let j = 0; j < data[i].activity.length; j++) {
+                    const content = data[i].activity[j]
+                    const dateArray = content.start.split("-");
+                    const monthIndex = dateArray[1]
+
+                    let currentClass = `.row${bulan[monthIndex-1]}`
+
+                    $(currentClass)[i].innerHTML += generateActivity(content.id, content.name)
+                }
+            }
+        }
+
+        $('#table-activity').DataTable({
+            ordering: true,
+            order: [],
+            fixedHeader: true,
+            scrollY: '620px',
+            scrollCollapse: true,
+        })
+    })
+</script>
+
 
 </body>
 </html>
